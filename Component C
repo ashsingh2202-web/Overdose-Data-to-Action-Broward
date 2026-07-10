@@ -1,0 +1,35 @@
+library(dplyr)
+
+# ---- MAIN: Total, Frequency, Percentage per column (printed to console) ----
+for (var in names(your_data)) {
+  cat("\n===", var, "===\n")
+  total <- sum(!is.na(your_data[[var]]))
+  cat("Total N:", total, "\n")
+  tab <- your_data %>%
+    filter(!is.na(.data[[var]])) %>%
+    count(.data[[var]]) %>%
+    rename(category = 1, frequency = n) %>%
+    mutate(percentage = round(100 * frequency / total, 1))
+  print(tab)
+}
+
+# ---- SAVE TO ENVIRONMENT: combined table with Column, Category, Frequency, Total, Percentage ----
+freq_results <- data.frame()
+
+for (var in names(your_data)) {
+  total <- sum(!is.na(your_data[[var]]))
+  tab <- table(your_data[[var]])
+  temp <- data.frame(
+    Column = var,
+    Category = names(tab),
+    Frequency = as.integer(tab),
+    Total = total,
+    Percentage = round(100 * as.integer(tab) / total, 1)
+  )
+  freq_results <- rbind(freq_results, temp)
+}
+
+View(freq_results)   # opens in RStudio Environment/Viewer
+
+# ---- OPTIONAL: Export to CSV ----
+# write.csv(freq_results, "frequency_results.csv", row.names = FALSE)
